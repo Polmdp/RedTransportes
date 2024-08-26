@@ -2,21 +2,30 @@ from django.db import models
 # Create your models here.
 from django.contrib.auth.models import User
 import datetime
+
+
 class Remolque(models.Model):
     matricula = models.BigIntegerField(primary_key=True)
-    peso= models.FloatField()
-    pesocarga= models.FloatField(default=0)
+    peso = models.FloatField()
+    pesocarga = models.FloatField(default=0)
+
 
 class Localidad(models.Model):
     nombre = models.CharField(max_length=255)
+
+
 class Pedido(models.Model):
     fechapedido = models.DateTimeField(default=datetime.datetime.now)
+    def getPrice(self):
+        return #Devolverpreciototal
+
 
 class Paquete(models.Model):
     peso = models.FloatField()
     tamaño = models.FloatField()
     localidad_fin = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
-    pedido = models.ForeignKey(Pedido,on_delete=models.SET_NULL)  # Relación de muchos paquetes a un pedido
+    pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True)  # Relación de muchos paquetes a un pedido
+
 
 class Cliente(models.Model):
     nombre = models.CharField(max_length=255)
@@ -40,36 +49,48 @@ class Conductor(models.Model):
         # "solo si es 3ro" , aca iria el desarrollo de esta funcion.
 
         pass
+
+
 class Ruta(models.Model):
     distancia = models.BigIntegerField()
-    localidad_inicio = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
-    localidad_fin = models.ForeignKey(Localidad, on_delete=models.SET_NULL)
+    localidad_inicio = models.ForeignKey(Localidad,on_delete=models.SET_NULL,null=True,blank=True,related_name='rutas_como_inicio')
+    localidad_fin = models.ForeignKey(Localidad,on_delete=models.SET_NULL,null=True, related_name='rutas_como_fin')
     tiempo_recorrido = models.DateTimeField()
+
 
 class Camion(models.Model):
     fechadeAlta = models.DateTimeField(default=datetime.datetime.now)
     matricula = models.BigIntegerField(primary_key=True)
     pesomaximo = models.FloatField()
+
+
 class HojaDeRuta(models.Model):
     volumen_carga = models.BigIntegerField(default=0)
     fecha_partida = models.DateTimeField(default=datetime.datetime.now)
     fecha_destino = models.DateTimeField(default=datetime.datetime.now)
-    ruta = models.ForeignKey(Ruta,on_delete=models.SET_NULL)
-    conductor = models.ForeignKey(Conductor,on_delete=models.SET_NULL)
+    ruta = models.ForeignKey(Ruta, on_delete=models.SET_NULL, null=True)
+    conductor = models.ForeignKey(Conductor, on_delete=models.SET_NULL, null=True)
+
     def getCost(self):
-        #Obtener el costo
+        # Obtener el costo
         return
+
     def getSpace(self):
-        #Devolver un boolean si el pedido tiene espacio
+        # Devolver un boolean si el pedido tiene espacio
         return
+
     def addPedido(self):
-        #Agregar un pedido
+        # Agregar un pedido
         return
+
     def toString(self):
         return str(self)
+
+
 class ConductorParticular(Conductor):
     tarifa = models.FloatField()
-    camion = models.ForeignKey(Camion, on_delete=models.SET_NULL)
+    camion = models.ForeignKey(Camion, on_delete=models.SET_NULL, null=True)
+
     def __str__(self):
         return f"{self.nombre} - Tarifa: {self.tarifa}"
 
@@ -82,6 +103,7 @@ class Administrador(models.Model):
     localidad = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
     telefono = models.BigIntegerField()
     email = models.EmailField()
+
     def authenticate(self):
-        #No se que va
+        # No se que va
         return
