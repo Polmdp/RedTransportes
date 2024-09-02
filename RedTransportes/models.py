@@ -14,17 +14,7 @@ class Localidad(models.Model):
     nombre = models.CharField(max_length=255)
 
 
-class Pedido(models.Model):
-    fechapedido = models.DateTimeField(default=datetime.datetime.now)
-    def getPrice(self):
-        return #Devolverpreciototal
 
-
-class Paquete(models.Model):
-    peso = models.FloatField()
-    tamaño = models.FloatField()
-    localidad_fin = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
-    pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True)  # Relación de muchos paquetes a un pedido
 
 
 class Cliente(models.Model):
@@ -34,6 +24,17 @@ class Cliente(models.Model):
     telefono = models.BigIntegerField()
     direccion = models.CharField(max_length=255)
     localidad = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
+
+class Pedido(models.Model):
+    fechapedido = models.DateTimeField(default=datetime.datetime.now)
+    cliente = models.ForeignKey(Cliente,on_delete=models.SET_NULL, null=True, blank=True)
+    def getPrice(self):
+        return #Devolverpreciototal
+class Paquete(models.Model):
+    peso = models.FloatField()
+    tamaño = models.FloatField()
+    localidad_fin = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
+    pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True)  # Relación de muchos paquetes a un pedido
 
 
 class Conductor(models.Model):
