@@ -14,16 +14,15 @@ import {
   Paper,
   Typography,
   CircularProgress,
-  Alert,
+  Alert, Button, Grid,
 } from '@mui/material';
-
+import ModalConductores from './ModalConductores'
 
 function ConductorList() {
   const [conductores, setConductores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
-
+  const [openModalConductores,setOpenModalConductores]=useState(false)
 const fetchConductores = async () => {
   try {
     const response = await axios.get('http://localhost:8000/RedTransportes/api/conductores/');
@@ -36,7 +35,12 @@ const fetchConductores = async () => {
     setLoading(false);
   }
 };
-
+const handleClickAgregar=()=>{
+  setOpenModalConductores(true)
+}
+const handleCloseAgregar=()=>{
+  setOpenModalConductores(false)
+}
 
   useEffect(() => {
     fetchConductores();
@@ -59,6 +63,8 @@ const fetchConductores = async () => {
 
   return (
     <TableContainer component={Paper}>
+      <Button onClick={handleClickAgregar} sx={{marginTop:'10px',marginLeft:'10px'}}  variant="contained"
+        color="primary">Agregar Conductor</Button>
       <Typography variant="h6" gutterBottom component="div" style={{ padding: '1rem' }}>
         Lista de Conductores
       </Typography>
@@ -86,8 +92,14 @@ const fetchConductores = async () => {
           ))}
         </TableBody>
       </Table>
+{openModalConductores &&(
+        <ModalConductores
+        isOpen={openModalConductores}
+        onClose={handleCloseAgregar}
+      />)}
     </TableContainer>
   );
+
 }
 
 export default ConductorList;
