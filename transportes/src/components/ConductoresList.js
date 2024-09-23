@@ -20,6 +20,7 @@ import ModalConductores from './ModalConductores'
 
 function ConductorList() {
   const [conductores, setConductores] = useState([]);
+  const [localidades, setLocalidades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [openModalConductores,setOpenModalConductores]=useState(false)
@@ -35,6 +36,17 @@ const fetchConductores = async () => {
     setLoading(false);
   }
 };
+  const fetchLocalidades = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/RedTransportes/api/localidades/');
+    console.log("Response", response)
+    setLocalidades(response.data);
+    console.log(response.data)
+  } catch (err) {
+    console.error('Error al obtener los conductores:', err);
+    setError(true);
+  }
+};
 const handleClickAgregar=()=>{
   setOpenModalConductores(true)
 }
@@ -44,6 +56,7 @@ const handleCloseAgregar=()=>{
 
   useEffect(() => {
     fetchConductores();
+    fetchLocalidades();
   }, []);
 
   if (loading) {
@@ -96,6 +109,7 @@ const handleCloseAgregar=()=>{
         <ModalConductores
         isOpen={openModalConductores}
         onClose={handleCloseAgregar}
+        localidades={localidades}
       />)}
     </TableContainer>
   );

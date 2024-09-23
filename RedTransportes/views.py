@@ -2,8 +2,8 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Conductor
-from .serializers import ConductorSerializer
+from .models import Conductor, Localidad
+from .serializers import ConductorSerializer, LocalidadSerializer
 
 
 class ConductorListCreateAPIView(APIView):
@@ -47,3 +47,9 @@ class ConductorDetailAPIView(APIView):
         conductor = self.get_object(pk)
         conductor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class LocalidadesListCreateAPIView(APIView):
+    def get(self, request):
+        localidades = Localidad.objects.all()
+        serializer = LocalidadSerializer(localidades, many=True)
+        return Response(serializer.data)

@@ -37,6 +37,7 @@ class Camion(models.Model):
 
 class Conductor(models.Model):
     nombre = models.CharField(max_length=255)
+    apellido = models.CharField(max_length=255)
     dni = models.CharField(max_length=20)
     direccion = models.CharField(max_length=255)
     localidad = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
