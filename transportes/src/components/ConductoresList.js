@@ -100,7 +100,7 @@ const handleCloseAgregar=()=>{
               <TableCell>{conductor.dni}</TableCell>
               <TableCell>{conductor.direccion}</TableCell>
               <TableCell>{conductor.telefono}</TableCell>
-              <TableCell>{conductor.localidad_nombre}</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           ))}
         </TableBody>

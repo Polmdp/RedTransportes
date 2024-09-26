@@ -74,27 +74,20 @@ class Pedido(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
 
     def getPrice(self):
-        total_price = sum(paquete.getPrice() for paquete in self.paquete_set.all())
+        total_price = sum(paquete.getPrice() for paquete in self.paquetes.all())
         return total_price
 
-    def __str__(self):
-        return f"Pedido {self.id} de {self.cliente}"
-
 class Paquete(models.Model):
+    pedido = models.ForeignKey(Pedido, related_name='paquetes', on_delete=models.CASCADE)
     peso = models.FloatField()
     tamaño = models.FloatField()
     localidad_fin = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
-    pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True)
 
     def getPrice(self):
         base_price = 5.0
         weight_price = self.peso * 2.0
         size_price = self.tamaño * 1.5
         return base_price + weight_price + size_price
-
-    def __str__(self):
-        return f"Paquete {self.id} del Pedido {self.pedido.id}"
-
 class HojaDeRuta(models.Model):
     volumen_carga = models.FloatField(default=0)
     fecha_partida = models.DateTimeField(auto_now_add=True)
