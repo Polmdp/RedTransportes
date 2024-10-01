@@ -107,18 +107,24 @@ class HojaDeRuta(models.Model):
         if hasattr(self.conductor, 'camion') and self.conductor.camion:
             max_capacity = self.conductor.camion.pesomaximo
         else:
-            max_capacity = 0  # Or some default value
+            max_capacity = 100  # O algún valor por defecto
+
+        # Carga actual
         current_load = sum(
             paquete.peso for pedido in self.pedidos.all()
-            for paquete in pedido.paquete_set.all()
+            for paquete in pedido.paquetes.all()  # Usar 'paquetes' debido al related_name
         )
-        new_load = sum(paquete.peso for paquete in new_pedido.paquete_set.all())
+
+        # Carga del nuevo pedido
+        new_load = sum(paquete.peso for paquete in new_pedido.paquetes.all())  # Usar 'paquetes'
+
+        # Verifica si hay espacio suficiente
         return (current_load + new_load) <= max_capacity
 
     def addPedido(self, pedido):
         if self.getSpace(pedido):
             self.pedidos.add(pedido)
-            self.volumen_carga += sum(paquete.peso for paquete in pedido.paquete_set.all())
+            self.volumen_carga += sum(paquete.peso for paquete in pedido.paquetes.all())
             self.save()
             return True
         else:
