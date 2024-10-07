@@ -1,14 +1,19 @@
 from rest_framework import serializers
-from .models import Conductor, Localidad, Cliente, Paquete, Pedido, HojaDeRuta
+from .models import Conductor, Localidad, Cliente, Paquete, Pedido, HojaDeRuta, Ruta
 
 
 class ConductorSerializer(serializers.ModelSerializer):
     localidad_nombre= serializers.SerializerMethodField()
+    nombre_completo = serializers.SerializerMethodField()
+
     class Meta:
         model = Conductor
-        fields = '__all__'
+        fields = ['id','localidad_nombre','nombre', 'apellido', 'nombre_completo']
     def get_localidad_nombre(self,obj):
         return obj.localidad.nombre if obj.localidad else ""
+
+    def get_nombre_completo(self,obj):
+        return f"{obj.nombre} {obj.apellido}"
 
 class LocalidadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,16 +33,27 @@ class ClienteSerializer(serializers.ModelSerializer):
 
 
 class PaqueteSerializer(serializers.ModelSerializer):
+    localidad_fin_nombre = serializers.SerializerMethodField()
+
     class Meta:
         model = Paquete
-        fields = ['id', 'peso', 'tamaño', 'localidad_fin']
+        fields = ['id', 'peso', 'tamaño', 'localidad_fin', 'localidad_fin_nombre']
+
+    def get_localidad_fin_nombre(self, obj):
+        return obj.localidad_fin.nombre if obj.localidad_fin else ""
 
 class PedidoSerializer(serializers.ModelSerializer):
     paquetes = PaqueteSerializer(many=True, required=False)
+    destinos = serializers.SerializerMethodField()
 
     class Meta:
         model = Pedido
-        fields = ['id', 'fechapedido', 'cliente', 'paquetes']
+        fields = ['id', 'fechapedido', 'cliente', 'paquetes', 'destinos']
+
+    def get_destinos(self, obj):
+        # Obtener todos los destinos únicos de los paquetes
+        destinos = set(paquete.localidad_fin.nombre for paquete in obj.paquetes.all() if paquete.localidad_fin)
+        return list(destinos)
 
     def create(self, validated_data):
         paquetes_data = validated_data.pop('paquetes', [])
@@ -50,12 +66,21 @@ class PedidoSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['precio_total'] = instance.getPrice()
         return representation
+class RutaSerializer(serializers.ModelSerializer):
+    localidad_inicio = LocalidadSerializer()
+    localidades_intermedias = LocalidadSerializer(many=True)
+    localidad_fin = LocalidadSerializer()
 
+    class Meta:
+        model = Ruta
+        fields = ['id', 'localidad_inicio', 'localidades_intermedias', 'localidad_fin']
 class HojaDeRutaSerializer(serializers.ModelSerializer):
+    ruta = RutaSerializer()
     pedidos = PedidoSerializer(many=True, required=False)
+    conductor = ConductorSerializer()
     class Meta:
         model = HojaDeRuta
-        fields = ['id', 'fecha_partida', 'fecha_destino', 'conductor', 'pedidos']
+        fields = ['id', 'ruta', 'fecha_partida', 'fecha_destino', 'conductor', 'pedidos']
 
     def create(self, validated_data):
         pedidos_data = validated_data.pop('pedidos', [])
@@ -66,3 +91,5 @@ class HojaDeRutaSerializer(serializers.ModelSerializer):
             for paquete_data in paquetes_data:
                 Paquete.objects.create(pedido=pedido, **paquete_data)
         return hoja_de_ruta
+
+

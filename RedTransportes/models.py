@@ -62,12 +62,33 @@ class ConductorParticular(Conductor):
 
 class Ruta(models.Model):
     distancia = models.FloatField()
-    localidad_inicio = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True, related_name='rutas_como_inicio')
-    localidad_fin = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True, related_name='rutas_como_fin')
     tiempo_recorrido = models.DurationField()
+    localidad_inicio = models.ForeignKey(
+        Localidad, on_delete=models.SET_NULL, null=True, blank=True, related_name='rutas_inicio'
+    )
+    localidad_fin = models.ForeignKey(
+        Localidad, on_delete=models.SET_NULL, null=True, blank=True, related_name='rutas_fin'
+    )
+    localidades_intermedias = models.ManyToManyField(
+        Localidad, related_name='rutas_intermedias', blank=True
+    )
 
     def __str__(self):
-        return f"Ruta de {self.localidad_inicio} a {self.localidad_fin}"
+        localidades_nombres = ', '.join(
+            localidad.nombre for localidad in self.localidades()
+        )
+        return f"Ruta: {localidades_nombres}"
+
+    def localidades(self):
+        # Retorna una lista de todas las localidades por las que pasa la ruta
+        localidades = []
+        if self.localidad_inicio:
+            localidades.append(self.localidad_inicio)
+        localidades += list(self.localidades_intermedias.all())
+        if self.localidad_fin:
+            localidades.append(self.localidad_fin)
+        return localidades
+
 
 class Pedido(models.Model):
     fechapedido = models.DateTimeField(auto_now_add=True)
@@ -88,6 +109,7 @@ class Paquete(models.Model):
         weight_price = self.peso * 2.0
         size_price = self.tamaño * 1.5
         return base_price + weight_price + size_price
+
 class HojaDeRuta(models.Model):
     volumen_carga = models.FloatField(default=0)
     fecha_partida = models.DateTimeField(auto_now_add=True)
@@ -97,38 +119,42 @@ class HojaDeRuta(models.Model):
     pedidos = models.ManyToManyField(Pedido, blank=True)
 
     def getCost(self):
-        cost_per_km = 1.0  # Adjust as necessary
+        cost_per_km = 1.0  # Ajusta según sea necesario
         base_cost = self.ruta.distancia * cost_per_km
         extra_cost = self.conductor.get_extra_cost()
         total_cost = base_cost + extra_cost
         return total_cost
 
     def getSpace(self, new_pedido):
-        if hasattr(self.conductor, 'camion') and self.conductor.camion:
-            max_capacity = self.conductor.camion.pesomaximo
-        else:
-            max_capacity = 100  # O algún valor por defecto
-
-        # Carga actual
-        current_load = sum(
-            paquete.peso for pedido in self.pedidos.all()
-            for paquete in pedido.paquetes.all()  # Usar 'paquetes' debido al related_name
+        max_capacity = (
+            self.conductor.camion.pesomaximo
+            if hasattr(self.conductor, 'camion') and self.conductor.camion
+            else 100
         )
-
-        # Carga del nuevo pedido
-        new_load = sum(paquete.peso for paquete in new_pedido.paquetes.all())  # Usar 'paquetes'
-
-        # Verifica si hay espacio suficiente
+        current_load = sum(
+            paquete.peso
+            for pedido in self.pedidos.all()
+            for paquete in pedido.paquetes.all()
+        )
+        new_load = sum(paquete.peso for paquete in new_pedido.paquetes.all())
         return (current_load + new_load) <= max_capacity
 
+    def is_localidad_on_route(self, localidad):
+        return localidad in self.ruta.localidades()
+
     def addPedido(self, pedido):
-        if self.getSpace(pedido):
-            self.pedidos.add(pedido)
-            self.volumen_carga += sum(paquete.peso for paquete in pedido.paquetes.all())
-            self.save()
-            return True
-        else:
-            return False
+        if not self.getSpace(pedido):
+            return False  # No hay espacio suficiente
+
+        # Verificar si todas las localidades destino de los paquetes están en la ruta
+        for paquete in pedido.paquetes.all():
+            if not self.is_localidad_on_route(paquete.localidad_fin):
+                return False  # La localidad destino no está en la ruta
+
+        self.pedidos.add(pedido)
+        self.volumen_carga += sum(paquete.peso for paquete in pedido.paquetes.all())
+        self.save()
+        return True
 
     def __str__(self):
         return f"HojaDeRuta {self.id} - Conductor: {self.conductor}"
