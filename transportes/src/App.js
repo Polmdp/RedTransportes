@@ -24,6 +24,9 @@ function App() {
                     <Button color="inherit" component={Link} to="/listaPedidos">
                         Lista de Pedidos
                     </Button>
+                    <Button color="inherit" component={Link} to="/hojaDeruta">
+                        Hoja de ruta
+                    </Button>
                 </Toolbar>
             </AppBar>
 

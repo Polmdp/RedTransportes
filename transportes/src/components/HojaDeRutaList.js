@@ -1,14 +1,28 @@
 import axios from "axios";
 import React, {useEffect, useState} from "react";
 import dayjs from 'dayjs';
-import {Box, TextField, Typography} from "@mui/material";
+import {
+    Box, Button,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography
+} from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import PedidoDetailModal from "./PedidoDetailModal";
 
 function ConductorList() {
     const [hojasDeRuta,setHojasDeRuta]=useState([])
     const [selectedDate, setSelectedDate] = useState(dayjs());
+    const [selectedPedido, setSelectedPedido] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
     const fetchHojaDeRuta = async () => {
         try {
             const response = await axios.get('http://localhost:8000/RedTransportes/api/hojaderuta/');
@@ -29,6 +43,11 @@ const formatDate = (dateString) => {
     const filteredHojasDeRuta = hojasDeRuta.filter(hoja =>
         dayjs(hoja.fecha_partida).isSame(selectedDate, 'day')
     );
+    const handlePedidoClick = (pedido) => {
+    setSelectedPedido(pedido);
+    setModalOpen(true);
+  };
+
     return (
        <Box>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -46,17 +65,41 @@ const formatDate = (dateString) => {
                         <Typography variant="h6">Hoja de Ruta: {hoja.id}</Typography>
                          <Typography>Fecha de Partida: {formatDate(hoja.fecha_partida)}</Typography>
       <Typography>Fecha de Destino: {formatDate(hoja.fecha_destino)}</Typography>
+                        <Typography>Conductor designado: {hoja.conductor}</Typography>
 
-                        {hoja.pedidos.map((pedido) => (
-                            <Box key={pedido.id} mt={2}>
-                                <Typography variant="subtitle1">Pedido: {pedido.id}</Typography>
-                                {pedido.paquetes.map((paquete) => (
-                                    <Typography key={paquete.id}>
-                                        Paquete: {paquete.id} - Peso: {paquete.peso} - Tamaño: {paquete.tamaño}
-                                    </Typography>
-                                ))}
-                            </Box>
-                        ))}
+                        <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Fecha</TableCell>
+              <TableCell>Cliente</TableCell>
+              <TableCell>Precio Total</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {hoja.pedidos.map((pedido) => (
+              <TableRow key={pedido.id}>
+                <TableCell>{pedido.id}</TableCell>
+                <TableCell>{new Date(pedido.fechapedido).toLocaleDateString()}</TableCell>
+                <TableCell>{pedido.cliente}</TableCell>
+                <TableCell>${pedido.precio_total.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Button variant="outlined" onClick={() => handlePedidoClick(pedido)}>
+                    Ver Detalles
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <PedidoDetailModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        pedido={selectedPedido}
+      />
                     </Box>
                 ))
             ) : (
