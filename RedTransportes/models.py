@@ -15,7 +15,7 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=20)
     direccion = models.CharField(max_length=255)
     localidad = models.ForeignKey(Localidad, on_delete=models.SET_NULL, null=True, blank=True)
-
+    email = models.EmailField(max_length=100)
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
@@ -91,9 +91,20 @@ class Ruta(models.Model):
 
 
 class Pedido(models.Model):
+    STATUS_CHOICES = [
+        ('CREADO', 'Creado'),
+        ('EN_RUTA', 'En Ruta'),
+        ('ENTREGADO', 'Entregado'),
+        ('CANCELADO', 'Cancelado'),
+    ]
+
     fechapedido = models.DateTimeField(auto_now_add=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
-
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='CREADO'
+    )
     def getPrice(self):
         total_price = sum(paquete.getPrice() for paquete in self.paquetes.all())
         return total_price

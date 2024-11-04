@@ -131,6 +131,8 @@ class PedidoListCreateAPIView(APIView):
         serializer = PedidoSerializer(data=request.data)
         if serializer.is_valid():
             pedido = serializer.save()
+            pedido.status = 'CREADO'
+            pedido.save()
             dias_a_verificar = 0
 
             # Iterar sobre cada paquete para asignarlo a una HojaDeRuta
@@ -156,6 +158,8 @@ class PedidoListCreateAPIView(APIView):
                             if hoja.getSpace(pedido) and hoja.is_localidad_on_route(paquete.localidad_fin):
                                 hoja.addPedido(pedido)
                                 hoja_asignada = hoja
+                                pedido.status = 'EN_RUTA'
+                                pedido.save()
                                 break
 
                         # Si no hay una hoja de ruta adecuada, aumentar los días

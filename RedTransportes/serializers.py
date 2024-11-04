@@ -8,7 +8,7 @@ class ConductorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Conductor
-        fields = ['id','localidad_nombre','nombre', 'apellido', 'nombre_completo']
+        fields = '__all__'
     def get_localidad_nombre(self,obj):
         return obj.localidad.nombre if obj.localidad else ""
 
@@ -45,15 +45,32 @@ class PaqueteSerializer(serializers.ModelSerializer):
 class PedidoSerializer(serializers.ModelSerializer):
     paquetes = PaqueteSerializer(many=True, required=False)
     destinos = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = Pedido
-        fields = ['id', 'fechapedido', 'cliente', 'paquetes', 'destinos']
+        fields = ['id', 'fechapedido', 'cliente', 'paquetes', 'destinos', 'status']
 
     def get_destinos(self, obj):
-        # Obtener todos los destinos únicos de los paquetes
         destinos = set(paquete.localidad_fin.nombre for paquete in obj.paquetes.all() if paquete.localidad_fin)
         return list(destinos)
+
+    def get_status(self, obj):
+        return {
+            'code': obj.status,
+            'display': obj.get_status_display(),
+            'descripcion': self.get_status_description(obj.status)
+        }
+
+    def get_status_description(self, status):
+        descriptions = {
+            'CREADO': 'El pedido ha sido creado y está pendiente de procesamiento',
+            'EN_RUTA': 'El pedido está en camino a su destino',
+            'ENTREGADO': 'El pedido ha sido entregado exitosamente',
+            'CANCELADO': 'El pedido ha sido cancelado'
+        }
+        return descriptions.get(status, 'Estado desconocido')
+
 
     def create(self, validated_data):
         paquetes_data = validated_data.pop('paquetes', [])
@@ -66,6 +83,8 @@ class PedidoSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['precio_total'] = instance.getPrice()
         return representation
+
+
 class RutaSerializer(serializers.ModelSerializer):
     localidad_inicio = LocalidadSerializer()
     localidades_intermedias = LocalidadSerializer(many=True)

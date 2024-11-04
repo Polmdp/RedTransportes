@@ -1,0 +1,123 @@
+classDiagram
+    class Localidad {
+        +nombre: String
+    }
+    
+    class Cliente {
+        +nombre: String
+        +apellido: String
+        +dni: String
+        +telefono: String
+        +direccion: String
+        +email: String
+    }
+    
+    class Remolque {
+        +matricula: String
+        +peso: Float
+        +pesocarga: Float
+    }
+    
+    class Camion {
+        +fechadeAlta: DateTime
+        +matricula: String
+        +pesomaximo: Float
+    }
+    
+    class Conductor {
+        +nombre: String
+        +apellido: String
+        +dni: String
+        +direccion: String
+        +telefono: String
+        +get_extra_cost(): Float
+    }
+    
+    class ConductorParticular {
+        +tarifa: Float
+        +get_extra_cost(): Float
+    }
+    
+    class Ruta {
+        +distancia: Float
+        +tiempo_recorrido: Duration
+        +localidades_intermedias: List<Localidad>
+    }
+    
+    class Pedido {
+        +fechapedido: DateTime
+        +status: String
+        +getPrice(): Float
+    }
+    
+    class Paquete {
+        +peso: Float
+        +tamaño: Float
+        +getPrice(): Float
+    }
+    
+    class HojaDeRuta {
+        +volumen_carga: Float
+        +fecha_partida: DateTime
+        +fecha_destino: DateTime
+        +getCost(): Float
+        +getSpace(new_pedido): Bool
+        +is_localidad_on_route(localidad): Bool
+        +addPedido(pedido): Bool
+    }
+    
+    class Administrador {
+        +nombre: String
+        +dni: String
+        +direccion: String
+        +telefono: String
+        +email: String
+    }
+
+    class PedidoObserver {
+        <<interface>>
+        +notify_new_pedido(pedido: Pedido)
+        +notify_status_change(pedido: Pedido)
+    }
+
+    class EmailNotifier {
+        +send_mail(subject: String, message: String, recipient: String)
+    }
+
+    class SignalDispatcher {
+        +post_save_signal: Signal
+        +dispatch_signal(sender, instance, created)
+        +notify_pedido_status_change(sender, instance, created)
+    }
+
+    class User {
+        +username: String
+        +email: String
+    }
+
+    Cliente --> Localidad : "localidad"
+    Conductor --> Localidad : "localidad"
+    ConductorParticular --> Camion : "camion"
+    Conductor <|-- ConductorParticular
+    
+    Ruta --> Localidad : "localidad_inicio"
+    Ruta --> Localidad : "localidad_fin"
+    Ruta --> Localidad : "localidades_intermedias"
+    
+    Pedido --> Cliente : "cliente"
+    Pedido --> Paquete : "0..* paquetes"
+    Paquete --> Pedido
+    Paquete --> Localidad : "localidad_fin"
+    
+    HojaDeRuta --> Ruta : "ruta"
+    HojaDeRuta --> Conductor : "conductor"
+    HojaDeRuta --> Pedido : "0..* pedidos"
+    
+    Administrador --> User : "user"
+    Administrador --> Localidad : "localidad"
+
+    PedidoObserver --> Pedido : "observes"
+    EmailNotifier --|> PedidoObserver : "implements"
+    SignalDispatcher --> PedidoObserver : "notifies"
+    Pedido --> SignalDispatcher : "triggers"
+    SignalDispatcher --> EmailNotifier : "uses"

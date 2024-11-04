@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DjangoModelDependency</ID>
+  <OriginalElement>#TransportesProject</OriginalElement>
+  <nodes>
+    <node x="1429.5" y="226.0">django.contrib.contenttypes.models.ContentType</node>
+    <node x="-203.5" y="666.0">RedTransportes.models.Paquete</node>
+    <node x="141.0" y="406.0">RedTransportes.models.Cliente</node>
+    <node x="987.0" y="346.0">RedTransportes.models.Conductor</node>
+    <node x="141.5" y="526.0">RedTransportes.models.Pedido</node>
+    <node x="310.5" y="226.0">RedTransportes.models.Localidad</node>
+    <node x="982.0" y="666.0">RedTransportes.models.HojaDeRuta</node>
+    <node x="1391.0" y="526.0">django.contrib.auth.models.Group</node>
+    <node x="-187.5" y="-14.0">django.db.models.utils.AltersData</node>
+    <node x="670.5" y="526.0">RedTransportes.models.ConductorParticular</node>
+    <node x="1397.0" y="666.0">django.contrib.auth.models.User</node>
+    <node x="-210.5" y="226.0">RedTransportes.models.Remolque</node>
+    <node x="510.5" y="406.0">RedTransportes.models.Ruta</node>
+    <node x="-173.5" y="106.0">django.db.models.base.Model</node>
+    <node x="1493.0" y="406.0">django.contrib.auth.models.Permission</node>
+    <node x="314.0" y="786.0">RedTransportes.models.Administrador</node>
+    <node x="819.0" y="406.0">RedTransportes.models.Camion</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="RedTransportes.models.HojaDeRuta" target="RedTransportes.models.Conductor" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Ruta" target="RedTransportes.models.Localidad" relationship="ManyToMany">
+      <point x="0.0" y="-14.0" />
+      <point x="640.0" y="340.0" />
+      <point x="460.0" y="340.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.auth.models.Permission" target="django.contrib.contenttypes.models.ContentType" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="1660.0" y="280.0" />
+      <point x="1640.0" y="280.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Administrador" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="480.0" y="760.0" />
+      <point x="1360.0" y="760.0" />
+      <point x="1360.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Paquete" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="-60.0" y="580.0" />
+      <point x="-240.0" y="580.0" />
+      <point x="-240.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.auth.models.Group" target="django.contrib.auth.models.Permission" relationship="ManyToMany">
+      <point x="0.0" y="-14.0" />
+      <point x="1540.0" y="480.0" />
+      <point x="1660.0" y="480.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Administrador" target="RedTransportes.models.Localidad" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="480.0" y="380.0" />
+      <point x="460.0" y="380.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Ruta" target="RedTransportes.models.Localidad" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="640.0" y="340.0" />
+      <point x="460.0" y="340.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Cliente" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="280.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.contenttypes.models.ContentType" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="1640.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Ruta" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="640.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Paquete" target="RedTransportes.models.Localidad" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="-60.0" y="580.0" />
+      <point x="440.0" y="580.0" />
+      <point x="440.0" y="380.0" />
+      <point x="460.0" y="380.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.auth.models.Permission" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="1660.0" y="280.0" />
+      <point x="1880.0" y="280.0" />
+      <point x="1880.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Remolque" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="-60.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Cliente" target="RedTransportes.models.Localidad" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="280.0" y="360.0" />
+      <point x="460.0" y="360.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Localidad" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="460.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.auth.models.Group" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="1540.0" y="500.0" />
+      <point x="1400.0" y="500.0" />
+      <point x="1400.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.ConductorParticular" target="RedTransportes.models.Camion" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="860.0" y="460.0" />
+      <point x="960.0" y="460.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.auth.models.User" target="django.contrib.auth.models.Permission" relationship="ManyToMany">
+      <point x="0.0" y="-14.0" />
+      <point x="1540.0" y="640.0" />
+      <point x="1720.0" y="640.0" />
+      <point x="1720.0" y="500.0" />
+      <point x="1660.0" y="500.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.HojaDeRuta" target="RedTransportes.models.Pedido" relationship="ManyToMany">
+      <point x="0.0" y="-14.0" />
+      <point x="1140.0" y="620.0" />
+      <point x="280.0" y="620.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.HojaDeRuta" target="RedTransportes.models.Ruta" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="1140.0" y="580.0" />
+      <point x="640.0" y="580.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Conductor" target="RedTransportes.models.Localidad" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="1140.0" y="320.0" />
+      <point x="460.0" y="320.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Camion" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="960.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.ConductorParticular" target="RedTransportes.models.Conductor" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="860.0" y="500.0" />
+      <point x="1140.0" y="500.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.ConductorParticular" target="RedTransportes.models.Localidad" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="860.0" y="460.0" />
+      <point x="800.0" y="460.0" />
+      <point x="800.0" y="380.0" />
+      <point x="460.0" y="380.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Paquete" target="RedTransportes.models.Pedido" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="-60.0" y="640.0" />
+      <point x="280.0" y="640.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Pedido" target="RedTransportes.models.Cliente" relationship="ForeignKey">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Administrador" target="django.contrib.auth.models.User" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="480.0" y="760.0" />
+      <point x="1540.0" y="760.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.contrib.auth.models.User" target="django.contrib.auth.models.Group" relationship="ManyToMany">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Conductor" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="1140.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.Pedido" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="280.0" y="500.0" />
+      <point x="120.0" y="500.0" />
+      <point x="120.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="RedTransportes.models.HojaDeRuta" target="django.db.models.base.Model" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="1140.0" y="580.0" />
+      <point x="1320.0" y="580.0" />
+      <point x="1320.0" y="200.0" />
+      <point x="-40.0" y="200.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="django.db.models.base.Model" target="django.db.models.utils.AltersData" relationship="OneToOne">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="0.6025206367924528" showDependencies="false" x="820.0" y="473.0784097859327" />
+  <SelectedNodes />
+  <Categories />
+</Diagram>
+
