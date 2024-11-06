@@ -10,7 +10,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Conductor, Localidad, Cliente, Pedido, HojaDeRuta, Ruta
 from .serializers import ConductorSerializer, LocalidadSerializer, ClienteSerializer, PedidoSerializer, \
-    PaqueteSerializer, HojaDeRutaSerializer
+    PaqueteSerializer, HojaDeRutaSerializer, ConductorParticularSerializer, CamionSerializer
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ConductorListCreateAPIView(APIView):
@@ -20,12 +24,80 @@ class ConductorListCreateAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = ConductorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            logger.debug("Recibiendo solicitud POST para agregar conductor.")
+            # Extraer los datos del request
+            conductor_data = request.data.get('conductor')
+            camion_particular_data = request.data.get('camionParticular')
+
+            logger.debug(f"Datos recibidos: Conductor: {conductor_data}, Camión Particular: {camion_particular_data}")
+
+            # Verificar si hay datos para el camión particular
+            if camion_particular_data:
+                # Crear camión
+                camion_data = {
+                    'matricula': camion_particular_data.get('camion_matricula'),
+                    'pesomaximo': camion_particular_data.get('camion_pesomaximo'),
+                    'fechadeAlta': timezone.now(),
+                }
+                logger.debug(f"Creando camión con los siguientes datos: {camion_data}")
+
+                camion_serializer = CamionSerializer(data=camion_data)
+                if camion_serializer.is_valid():
+                    camion = camion_serializer.save()  # Guardar el camión
+                    logger.debug(f"Camión creado: {camion.matricula}")
+
+                    # Crear conductor particular
+                    particular_data = {
+                        'nombre': conductor_data.get('nombre'),
+                        'apellido': conductor_data.get('apellido'),
+                        'dni': conductor_data.get('dni'),
+                        'direccion': conductor_data.get('direccion'),
+                        'localidad': conductor_data.get('localidad'),
+                        'telefono': conductor_data.get('telefono'),
+                        'tarifa': camion_particular_data.get('tarifa'),
+                        'camion': camion.matricula,  # Asociar el camión al conductor particular usando el ID del camión
+                    }
+                    logger.debug(f"Creando conductor particular con los siguientes datos: {particular_data}")
+
+                    # Crear el conductor particular
+                    particular_serializer = ConductorParticularSerializer(data=particular_data)
+                    if particular_serializer.is_valid():
+                        particular_serializer.save()  # Guardar conductor particular
+                        logger.debug("Conductor particular creado exitosamente.")
+                        return Response(particular_serializer.data, status=status.HTTP_201_CREATED)
+                    else:
+                        logger.error(f"Error al crear conductor particular: {particular_serializer.errors}")
+                        camion.delete()  # Eliminar el camión si algo falla
+                        return Response(particular_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    logger.error(f"Error al crear camión: {camion_serializer.errors}")
+                    return Response(camion_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # Si el conductor no es particular, crear solo el conductor sin el camión
+                conductor_data = {
+                    'nombre': conductor_data.get('nombre'),
+                    'apellido': conductor_data.get('apellido'),
+                    'dni': conductor_data.get('dni'),
+                    'direccion': conductor_data.get('direccion'),
+                    'localidad': conductor_data.get('localidad'),
+                    'telefono': conductor_data.get('telefono'),
+                }
+                logger.debug(f"Creando conductor con los siguientes datos: {conductor_data}")
+
+                # Crear el conductor
+                conductor_serializer = ConductorSerializer(data=conductor_data)
+                if conductor_serializer.is_valid():
+                    conductor_serializer.save()  # Guardar conductor
+                    logger.debug("Conductor creado exitosamente.")
+                    return Response(conductor_serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    logger.error(f"Error al crear conductor: {conductor_serializer.errors}")
+                    return Response(conductor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Error inesperado: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ConductorDetailAPIView(APIView):

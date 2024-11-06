@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from .models import Conductor, Localidad, Cliente, Paquete, Pedido, HojaDeRuta, Ruta
+from .models import Conductor, Localidad, Cliente, Paquete, Pedido, HojaDeRuta, Ruta,ConductorParticular,Camion
 
 
 class ConductorSerializer(serializers.ModelSerializer):
     localidad_nombre= serializers.SerializerMethodField()
     nombre_completo = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Conductor
@@ -15,6 +16,15 @@ class ConductorSerializer(serializers.ModelSerializer):
     def get_nombre_completo(self,obj):
         return f"{obj.nombre} {obj.apellido}"
 
+class ConductorParticularSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConductorParticular
+        fields = ['nombre', 'apellido', 'dni', 'direccion', 'telefono', 'localidad', 'tarifa', 'camion']
+
+class CamionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Camion
+        fields = '__all__'
 class LocalidadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Localidad
