@@ -217,6 +217,10 @@ class PedidoListCreateAPIView(APIView):
 
         return ruta
 
+    def get(self, request):
+        pedidos = Pedido.objects.all()
+        serializer_pedido = PedidoSerializer(pedidos, many=True)
+        return Response(serializer_pedido.data)
     def post(self, request):
         serializer = PedidoSerializer(data=request.data)
         if serializer.is_valid():

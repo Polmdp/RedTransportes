@@ -45,7 +45,7 @@ function ConductorList() {
     }, []);
 
     const filteredHojasDeRuta = hojasDeRuta.filter(hoja =>
-        dayjs(hoja.fecha_partida).isSame(selectedDate, 'day')
+        dayjs(hoja.fecha_destino).isSame(selectedDate, 'day')
     );
 
     const handlePedidoClick = (pedido) => {
@@ -113,10 +113,10 @@ function ConductorList() {
 
                                 <Box sx={{ my: 2 }}>
                                     <Typography>
-                                        <strong>Fecha de Partida:</strong> {formatDate(hoja.fecha_partida)}
+                                        <strong>Fecha de Despacho:</strong> {formatDate(hoja.fecha_partida)}
                                     </Typography>
                                     <Typography>
-                                        <strong>Fecha de Despacho:</strong> {formatDate(hoja.fecha_destino)}
+                                        <strong>Fecha de Llegada:</strong> {formatDate(hoja.fecha_destino)}
                                     </Typography>
                                     <Typography>
                                         <strong>Conductor:</strong> {hoja.conductor.nombre_completo} (ID: {hoja.conductor.id})

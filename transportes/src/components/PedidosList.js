@@ -29,6 +29,7 @@ const PedidosList = () => {
     try {
       const response = await axios.get('http://localhost:8000/RedTransportes/api/pedidos/');
       setPedidos(response.data);
+      console.log(response.data)
       setLoading(false);
     } catch (err) {
       console.error('Error al obtener los pedidos:', err);
@@ -72,7 +73,7 @@ const PedidosList = () => {
                 <TableCell>{pedido.id}</TableCell>
                 <TableCell>{new Date(pedido.fechapedido).toLocaleDateString()}</TableCell>
                 <TableCell>{pedido.cliente}</TableCell>
-                <TableCell>${pedido.precio_total.toFixed(2)}</TableCell>
+                <TableCell>${pedido.precio_total.total_price.toFixed(2)}</TableCell>
                 <TableCell>
                   <Button variant="outlined" onClick={() => handlePedidoClick(pedido)}>
                     Ver Detalles

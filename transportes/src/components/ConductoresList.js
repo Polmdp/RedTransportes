@@ -86,6 +86,7 @@ const handleCloseAgregar=()=>{
           <TableRow>
             <TableCell><strong>ID</strong></TableCell>
             <TableCell><strong>Nombre</strong></TableCell>
+            <TableCell><strong>Apellido</strong></TableCell>
             <TableCell><strong>DNI</strong></TableCell>
             <TableCell><strong>Dirección</strong></TableCell>
             <TableCell><strong>Teléfono</strong></TableCell>
@@ -97,6 +98,7 @@ const handleCloseAgregar=()=>{
             <TableRow key={conductor.id}>
               <TableCell>{conductor.id}</TableCell>
               <TableCell>{conductor.nombre}</TableCell>
+              <TableCell>{conductor.apellido}</TableCell>
               <TableCell>{conductor.dni}</TableCell>
               <TableCell>{conductor.direccion}</TableCell>
               <TableCell>{conductor.telefono}</TableCell>
