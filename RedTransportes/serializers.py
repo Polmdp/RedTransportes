@@ -33,6 +33,7 @@ class LocalidadSerializer(serializers.ModelSerializer):
 
 class ClienteSerializer(serializers.ModelSerializer):
     localidad_nombre = serializers.SerializerMethodField()
+    localidad = serializers.PrimaryKeyRelatedField(queryset=Localidad.objects.all(), required=False)
 
     class Meta:
         model = Cliente

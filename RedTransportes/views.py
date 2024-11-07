@@ -1,8 +1,6 @@
-from datetime import timedelta
 
-from django.db import models
 from django.db.models import Q
-
+from datetime import timedelta
 from django.http import Http404
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -147,12 +145,19 @@ class ClienteListCreateAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        # Usamos el serializador para validar los datos
         serializer = ClienteSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid():
+
+            # Guardamos el cliente si los datos son válidos
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        # Si no es válido, respondemos con un error detallado
+        return Response({
+            "error": "Datos de cliente incorrectos",
+            "detail": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 class ClienteDetailAPIView(APIView):
     def get_object(self, pk):
         try:
@@ -180,9 +185,22 @@ class ClienteDetailAPIView(APIView):
 
 
 class PedidoListCreateAPIView(APIView):
-    def get_available_driver(self):
-        # Lógica para seleccionar un conductor disponible (ajustar según tus reglas)
-        return Conductor.objects.first()
+    def get_available_driver(self, fecha):
+        # Buscar un conductor disponible que no esté asignado a otra HojaDeRuta en la fecha dada
+        conductor = Conductor.objects.exclude(
+            hojaderuta__fecha_destino__day=fecha.day,
+            hojaderuta__fecha_destino__month=fecha.month,
+            hojaderuta__fecha_destino__year=fecha.year,
+
+        ).first()  # Ajusta la lógica de selección según tus necesidades
+
+        if conductor:
+            # Marcar al conductor como no disponible temporalmente para evitar conflictos
+            conductor.disponible = False
+            conductor.save()
+        return conductor
+
+
 
     def get_route_for_pedido(self, localidad_inicio, localidad_fin):
         # Buscar una ruta donde la localidad de inicio sea el hub (localidad 3)
@@ -207,14 +225,12 @@ class PedidoListCreateAPIView(APIView):
             pedido.save()
             dias_a_verificar = 0
 
-            # Iterar sobre cada paquete para asignarlo a una HojaDeRuta
             for paquete in pedido.paquetes.all():
                 hoja_asignada = None
 
                 while not hoja_asignada:
                     fecha_verificar = timezone.now().date() + timedelta(days=dias_a_verificar)
 
-                    # Verificar si existe alguna HojaDeRuta para la ruta y fecha especificada
                     try:
                         ruta = self.get_route_for_pedido(localidad_inicio=3, localidad_fin=paquete.localidad_fin)
                         hojas_ruta_existente = HojaDeRuta.objects.filter(
@@ -225,7 +241,6 @@ class PedidoListCreateAPIView(APIView):
                         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
                     if hojas_ruta_existente.exists():
-                        # Buscar una hoja de ruta que tenga espacio y acepte la localidad
                         for hoja in hojas_ruta_existente:
                             if hoja.getSpace(pedido) and hoja.is_localidad_on_route(paquete.localidad_fin):
                                 hoja.addPedido(pedido)
@@ -234,19 +249,20 @@ class PedidoListCreateAPIView(APIView):
                                 pedido.save()
                                 break
 
-                        # Si no hay una hoja de ruta adecuada, aumentar los días
                         if not hoja_asignada:
                             dias_a_verificar += 1
                     else:
-                        # Si no hay hojas de ruta, crear una nueva
+                        conductor = self.get_available_driver(fecha_verificar)
+                        if not conductor:
+                            return Response({"error": "No hay conductores disponibles"}, status=status.HTTP_400_BAD_REQUEST)
+
                         nueva_hoja_ruta = HojaDeRuta.objects.create(
                             fecha_partida=timezone.now().date() + timedelta(days=dias_a_verificar),
                             fecha_destino=timezone.now() + timedelta(days=dias_a_verificar, hours=5),
-                            conductor=self.get_available_driver(),
+                            conductor=conductor,
                             ruta=ruta,
                         )
 
-                        # Verificar si la nueva hoja de ruta puede aceptar el paquete
                         if nueva_hoja_ruta.is_localidad_on_route(paquete.localidad_fin):
                             nueva_hoja_ruta.pedidos.add(pedido)
                             nueva_hoja_ruta.save()
@@ -257,7 +273,6 @@ class PedidoListCreateAPIView(APIView):
 
             return Response(PedidoSerializer(pedido).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class PedidoDetailAPIView(APIView):
     def get_object(self, pk):
         try:

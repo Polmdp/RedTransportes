@@ -14,6 +14,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
+import CrearClienteModal from './ClienteModal';
 
 const PedidoForm = () => {
     const [clientes, setClientes] = useState([]);
@@ -27,6 +28,7 @@ const PedidoForm = () => {
         message: '',
         severity: 'success',
     });
+    const [openModal, setOpenModal] = useState(false); // Control para abrir el modal
 
     useEffect(() => {
         fetchClientes();
@@ -52,25 +54,25 @@ const PedidoForm = () => {
     };
 
     const handleClienteChange = (event, newValue) => {
-        setPedido({...pedido, cliente: newValue});
+        setPedido({ ...pedido, cliente: newValue });
     };
 
     const handlePaqueteChange = (index, field, value) => {
         const newPaquetes = [...pedido.paquetes];
         newPaquetes[index][field] = value;
-        setPedido({...pedido, paquetes: newPaquetes});
+        setPedido({ ...pedido, paquetes: newPaquetes });
     };
 
     const addPaquete = () => {
         setPedido({
             ...pedido,
-            paquetes: [...pedido.paquetes, {peso: '', tamaño: '', localidad_fin: null}],
+            paquetes: [...pedido.paquetes, { peso: '', tamaño: '', localidad_fin: null }],
         });
     };
 
     const removePaquete = (index) => {
         const newPaquetes = pedido.paquetes.filter((_, i) => i !== index);
-        setPedido({...pedido, paquetes: newPaquetes});
+        setPedido({ ...pedido, paquetes: newPaquetes });
     };
 
     const handleSubmit = async (event) => {
@@ -81,8 +83,8 @@ const PedidoForm = () => {
                 paquetes: pedido.paquetes.map(paquete => ({
                     peso: paquete.peso,
                     tamaño: paquete.tamaño,
-                    localidad_fin: paquete.localidad_fin ? paquete.localidad_fin.id : null
-                }))
+                    localidad_fin: paquete.localidad_fin ? paquete.localidad_fin.id : null,
+                })),
             };
             const response = await axios.post('http://localhost:8000/RedTransportes/api/pedidos/', pedidoData);
             setSnackbar({
@@ -111,18 +113,25 @@ const PedidoForm = () => {
         setSnackbar({ ...snackbar, open: false });
     };
 
+    const openCreateClienteModal = () => setOpenModal(true);
+    const closeCreateClienteModal = () => setOpenModal(false);
+
     return (
-        <Paper elevation={3} sx={{p: 3, maxWidth: 600, mx: 'auto', mt: 4}}>
+        <Paper elevation={3} sx={{ p: 3, maxWidth: 600, mx: 'auto', mt: 4 }}>
             <Typography variant="h5" gutterBottom>
                 Crear Nuevo Pedido
             </Typography>
+            <Button variant="outlined" color="primary" onClick={openCreateClienteModal} startIcon={<AddIcon />}>
+                Crear Cliente
+            </Button>
+
             <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <Autocomplete
                             options={clientes}
                             getOptionLabel={(option) => `${option.nombre} ${option.apellido}`}
-                            renderInput={(params) => <TextField {...params} label="Cliente" required/>}
+                            renderInput={(params) => <TextField {...params} label="Cliente" required />}
                             value={pedido.cliente}
                             onChange={handleClienteChange}
                         />
@@ -130,7 +139,7 @@ const PedidoForm = () => {
 
                     {pedido.paquetes.map((paquete, index) => (
                         <Grid item xs={12} key={index}>
-                            <Paper elevation={2} sx={{p: 2, position: 'relative'}}>
+                            <Paper elevation={2} sx={{ p: 2, position: 'relative' }}>
                                 <Typography variant="h6" gutterBottom>
                                     Paquete {index + 1}
                                 </Typography>
@@ -159,7 +168,7 @@ const PedidoForm = () => {
                                         <Autocomplete
                                             options={localidades}
                                             getOptionLabel={(option) => option.nombre}
-                                            renderInput={(params) => <TextField {...params} label="Localidad de destino" required/>}
+                                            renderInput={(params) => <TextField {...params} label="Localidad de destino" required />}
                                             value={paquete.localidad_fin}
                                             onChange={(event, newValue) => handlePaqueteChange(index, 'localidad_fin', newValue)}
                                         />
@@ -169,9 +178,9 @@ const PedidoForm = () => {
                                     <IconButton
                                         aria-label="delete"
                                         onClick={() => removePaquete(index)}
-                                        sx={{position: 'absolute', top: 8, right: 8}}
+                                        sx={{ position: 'absolute', top: 8, right: 8 }}
                                     >
-                                        <DeleteIcon/>
+                                        <DeleteIcon />
                                     </IconButton>
                                 )}
                             </Paper>
@@ -179,7 +188,7 @@ const PedidoForm = () => {
                     ))}
 
                     <Grid item xs={12}>
-                        <Button startIcon={<AddIcon/>} onClick={addPaquete}>
+                        <Button startIcon={<AddIcon />} onClick={addPaquete}>
                             Añadir Paquete
                         </Button>
                     </Grid>
@@ -201,6 +210,9 @@ const PedidoForm = () => {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            {/* Modal para crear cliente */}
+            <CrearClienteModal open={openModal} onClose={closeCreateClienteModal} fetchClientes={fetchClientes} localidades={localidades}/>
         </Paper>
     );
 };

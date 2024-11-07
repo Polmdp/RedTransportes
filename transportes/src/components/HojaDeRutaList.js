@@ -116,7 +116,7 @@ function ConductorList() {
                                         <strong>Fecha de Partida:</strong> {formatDate(hoja.fecha_partida)}
                                     </Typography>
                                     <Typography>
-                                        <strong>Fecha de Destino:</strong> {formatDate(hoja.fecha_destino)}
+                                        <strong>Fecha de Despacho:</strong> {formatDate(hoja.fecha_destino)}
                                     </Typography>
                                     <Typography>
                                         <strong>Conductor:</strong> {hoja.conductor.nombre_completo} (ID: {hoja.conductor.id})
