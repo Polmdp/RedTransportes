@@ -80,7 +80,7 @@ const PedidoDetailModal = ({ open, onClose, pedido }) => {
                <strong>Estado:</strong> {renderStatus(pedido.status)}
              </Typography>
              <Typography variant="body1" gutterBottom>
-               <strong>Precio Total:</strong> ${pedido.precio_total.toFixed(2)}
+               <strong>Precio Total:</strong> ${pedido.precio_total.total_price.toFixed(2)}
              </Typography>
            </Grid>
          </Grid>

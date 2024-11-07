@@ -145,7 +145,7 @@ function ConductorList() {
                                                 <TableCell>{pedido.id}</TableCell>
                                                 <TableCell>{new Date(pedido.fechapedido).toLocaleDateString()}</TableCell>
                                                 <TableCell>{pedido.cliente}</TableCell>
-                                                <TableCell>${pedido.precio_total.toFixed(2)}</TableCell>
+                                                <TableCell>${pedido.precio_total.total_price.toFixed(2)}</TableCell>
                                                 <TableCell>
                                                     {pedido.destinos.map((destino, index) => (
                                                         <Chip

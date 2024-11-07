@@ -105,9 +105,35 @@ class Pedido(models.Model):
         choices=STATUS_CHOICES,
         default='CREADO'
     )
+
     def getPrice(self):
-        total_price = sum(paquete.getPrice() for paquete in self.paquetes.all())
-        return total_price
+        paquetes = self.paquetes.all()
+        localidad_counts = {}
+        descuento_aplicado = False
+
+        for paquete in paquetes:
+            localidad_id = paquete.localidad_fin_id
+            if localidad_id in localidad_counts:
+                localidad_counts[localidad_id].append(paquete)
+            else:
+                localidad_counts[localidad_id] = [paquete]
+
+        total_price = 0
+        for paquetes_en_localidad in localidad_counts.values():
+            num_paquetes = len(paquetes_en_localidad)
+            if num_paquetes > 1:
+                descuento_aplicado = True
+                paquetes_a_pagar = (num_paquetes + 1) // 2
+                total_price += sum(paquete.getPrice() for paquete in paquetes_en_localidad[:paquetes_a_pagar])
+            else:
+                total_price += paquetes_en_localidad[0].getPrice()
+
+        # Retornar el total del precio y si se aplicó el descuento 2x1
+        return {
+            'total_price': total_price,
+            'descuento_aplicado': descuento_aplicado
+        }
+
 
 class Paquete(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='paquetes', on_delete=models.CASCADE)

@@ -75,36 +75,42 @@ const PedidoForm = () => {
         setPedido({ ...pedido, paquetes: newPaquetes });
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            const pedidoData = {
-                cliente: pedido.cliente ? pedido.cliente.id : null,
-                paquetes: pedido.paquetes.map(paquete => ({
-                    peso: paquete.peso,
-                    tamaño: paquete.tamaño,
-                    localidad_fin: paquete.localidad_fin ? paquete.localidad_fin.id : null,
-                })),
-            };
-            const response = await axios.post('http://localhost:8000/RedTransportes/api/pedidos/', pedidoData);
-            setSnackbar({
-                open: true,
-                message: `Pedido creado con éxito. Precio total: $${response.data.precio_total.toFixed(2)}`,
-                severity: 'success',
-            });
-            setPedido({
-                cliente: null,
-                paquetes: [{ peso: '', tamaño: '', localidad_fin: null }],
-            });
-        } catch (error) {
-            console.error('Error al crear el pedido:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error al crear el pedido. Por favor, intente nuevamente.',
-                severity: 'error',
-            });
-        }
-    };
+   const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+        const pedidoData = {
+            cliente: pedido.cliente ? pedido.cliente.id : null,
+            paquetes: pedido.paquetes.map(paquete => ({
+                peso: paquete.peso,
+                tamaño: paquete.tamaño,
+                localidad_fin: paquete.localidad_fin ? paquete.localidad_fin.id : null,
+            })),
+        };
+        const response = await axios.post('http://localhost:8000/RedTransportes/api/pedidos/', pedidoData);
+
+        const precioTotal = response.data.precio_total.total_price;
+        const descuentoAplicado = response.data.precio_total.descuento_aplicado;
+
+        setSnackbar({
+            open: true,
+            message: `Pedido creado con éxito. Precio total: $${precioTotal.toFixed(2)}${descuentoAplicado ? ' (se aplicó el 2x1)' : ''}`,
+            severity: 'success',
+        });
+
+        setPedido({
+            cliente: null,
+            paquetes: [{ peso: '', tamaño: '', localidad_fin: null }],
+        });
+    } catch (error) {
+        console.error('Error al crear el pedido:', error);
+        setSnackbar({
+            open: true,
+            message: 'Error al crear el pedido. Por favor, intente nuevamente.',
+            severity: 'error',
+        });
+    }
+};
+
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
